@@ -1,0 +1,19 @@
+<div class="response" ng-class="'response-' + $ctrl.response.tipo">
+  <div class="speech-bubble answer-bubble">
+    <div class="cut-card"><div class="cut-card-inner response-body">
+      <h2 class="eyebrow response-label"><span class="state-dot" ng-class="{'answer-dot': $ctrl.response.tipo === 'resposta', 'refusal-dot': $ctrl.response.tipo === 'recusa', 'clarify-dot': $ctrl.response.tipo === 'esclarecer'}" aria-hidden="true"></span><span ng-bind="$ctrl.label"></span></h2>
+      <p class="answer-highlight" ng-if="$ctrl.response.destaque" ng-class="{'long-highlight': $ctrl.response.destaque.length > 18}" ng-bind="$ctrl.response.destaque"></p>
+      <p class="answer-text" ng-bind="$ctrl.response.texto"></p>
+      <div class="bar-chart" ng-if="$ctrl.response.barras.length" role="group" aria-label="Comparação de valores por período">
+        <div class="bar-row" ng-repeat="bar in $ctrl.response.barras track by $index"><span class="bar-label" ng-bind="bar.rotulo"></span><span class="bar-track"><span class="bar-fill" ng-class="{'is-current': bar.atual}" ng-style="{'width': (bar.valor / $ctrl.maximum * 100) + '%'}"></span></span><span class="bar-value" ng-bind="$ctrl.format.compacto(bar.valor)"></span></div>
+      </div>
+      <div class="table-scroll" ng-if="$ctrl.response.tabela.length" tabindex="0" role="region" aria-label="Tabela de vendas por produto. Role horizontalmente para ver todas as colunas.">
+        <table><caption class="sr-only">Produtos, quantidade vendida, faturamento e participação no faturamento</caption><thead><tr><th scope="col">#</th><th scope="col">Produto</th><th scope="col" class="numeric">Qtd.</th><th scope="col" class="numeric">Valor</th><th scope="col" class="numeric">Part.</th></tr></thead><tbody><tr ng-repeat="row in $ctrl.response.tabela track by $index"><td ng-bind="row.posicao"></td><th scope="row" ng-bind="row.produto"></th><td class="numeric" ng-bind="$ctrl.format.numero(row.quantidade)"></td><td class="numeric" ng-bind="row.valor"></td><td class="numeric" ng-bind="$ctrl.format.percentual(row.participacao)"></td></tr></tbody></table>
+      </div>
+      <p class="origin" ng-if="$ctrl.response.origem"><span aria-hidden="true">↳ </span><span ng-bind="$ctrl.response.origem"></span></p>
+      <div class="response-actions inline-actions" ng-if="$ctrl.response.tipo !== 'resposta' && $ctrl.response.acoes.length"><button class="outline-button" ng-repeat="action in $ctrl.response.acoes track by $index" ng-click="$ctrl.onAction({action: action})" ng-disabled="$ctrl.busy" ng-bind="action.rotulo"></button></div>
+    </div></div>
+  </div>
+  <div class="response-actions" ng-if="$ctrl.response.tipo === 'resposta'"><button class="outline-button" ng-repeat="action in $ctrl.response.acoes track by $index" ng-click="$ctrl.onAction({action: action})" ng-disabled="$ctrl.busy" ng-bind="action.rotulo"></button><button class="outline-button" ng-click="$ctrl.copy()">Copiar resposta</button></div>
+  <p class="copy-status" role="status" ng-if="$ctrl.copyStatus" ng-bind="$ctrl.copyStatus"></p>
+</div>

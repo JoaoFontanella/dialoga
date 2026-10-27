@@ -1,0 +1,11 @@
+{
+  "name": "dialoga-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Frontend AngularJS da Dialoga, preparado para CodeIgniter 3 e PostgreSQL.",
+  "scripts": {
+    "start": "python3 -m http.server 8080 --bind 127.0.0.1 --directory .",
+    "test": "node tests/static.test.cjs",
+    "test:browser": "node tests/browser.cjs"
+  }
+}

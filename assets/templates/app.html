@@ -1,0 +1,92 @@
+<div class="app-shell" ng-attr-data-theme="{{$ctrl.theme}}" ng-keydown="$event.key === 'Escape' && $ctrl.closePanels()">
+  <a class="skip-link" href="#pergunta">Ir para a pergunta</a>
+  <button class="sidebar-scrim" ng-if="$ctrl.menuOpen" ng-click="$ctrl.menuOpen = false" aria-label="Fechar histórico"></button>
+  <aside class="sidebar" ng-class="{'is-open': $ctrl.menuOpen}" id="lateral" aria-label="Conversas e informações da base" dialoga-focus-trap="$ctrl.menuOpen" ng-attr-inert="{{$ctrl.helpOpen ? '' : undefined}}">
+    <div class="sidebar-brand">
+      <img ng-src="{{$ctrl.assets}}marca/assinatura-{{$ctrl.theme === 'escuro' ? 'papel' : 'tinta'}}.svg" alt="Dialoga" width="176" height="34">
+      <button class="icon-button close-sidebar" ng-click="$ctrl.menuOpen = false" aria-label="Fechar histórico">×</button>
+    </div>
+    <button class="new-conversation" ng-click="$ctrl.newConversation()" ng-disabled="$ctrl.busy"><span aria-hidden="true">+</span> Nova pergunta</button>
+    <nav class="history" aria-label="Histórico da sessão">
+      <h2 class="eyebrow">Histórico</h2>
+      <p class="history-empty" ng-if="!$ctrl.history.length">Suas perguntas aparecem aqui.<br>Uma conversa de cada vez.</p>
+      <ul>
+        <li ng-repeat="entry in $ctrl.history track by entry.id">
+          <button ng-click="$ctrl.visit(entry)" ng-disabled="$ctrl.busy" ng-class="{'is-current': $ctrl.currentId === entry.id}" ng-attr-aria-current="{{$ctrl.currentId === entry.id ? 'true' : undefined}}"><span ng-bind="entry.question"></span></button>
+        </li>
+      </ul>
+    </nav>
+    <div class="base-info">
+      <p class="eyebrow">Base de vendas</p>
+      <p class="base-name" ng-bind="$ctrl.status ? 'Vendas · ERP' : 'Base não conectada'"></p>
+      <p class="read-only" ng-if="$ctrl.status"><span class="state-dot answer-dot" aria-hidden="true"></span>Só lê. Nada é alterado.</p>
+      <p class="base-coverage" ng-if="$ctrl.status">{{$ctrl.format.data($ctrl.status.base.inicio)}} a {{$ctrl.format.data($ctrl.status.base.fim)}}</p>
+      <p class="base-coverage" ng-if="!$ctrl.status">As respostas estarão disponíveis após a integração.</p>
+      <p class="base-coverage" ng-if="$ctrl.statusLoading">Identificando a base…</p>
+      <div class="status-error" ng-if="$ctrl.statusError" role="status">Não foi possível conectar.<button class="text-button" ng-click="$ctrl.loadStatus()" ng-disabled="$ctrl.statusLoading">Tentar novamente</button></div>
+    </div>
+    <div class="session-info"><span class="session-monogram" aria-hidden="true">D</span><div><span>Sua sessão</span><small>Histórico neste navegador</small></div></div>
+  </aside>
+
+  <main class="workspace" ng-attr-inert="{{$ctrl.helpOpen ? '' : undefined}}">
+    <header class="topbar">
+      <button class="icon-button menu-button" ng-click="$ctrl.menuOpen = true" aria-controls="lateral" ng-attr-aria-expanded="{{$ctrl.menuOpen}}" aria-label="Abrir histórico"><span class="menu-lines" aria-hidden="true"></span></button>
+      <img class="mobile-symbol" ng-src="{{$ctrl.assets}}marca/simbolo-{{$ctrl.theme === 'escuro' ? 'papel' : 'tinta'}}.svg" alt="" width="28" height="20">
+      <h1>Vendas</h1>
+      <span class="reference-date" ng-if="$ctrl.status">Data de referência · {{$ctrl.format.data($ctrl.status.hoje)}}</span>
+      <div class="topbar-actions">
+        <button class="theme-button" ng-click="$ctrl.toggleTheme()" ng-attr-aria-label="Ativar modo {{$ctrl.theme === 'claro' ? 'escuro' : 'claro'}}" ng-attr-title="Modo {{$ctrl.theme === 'claro' ? 'escuro' : 'claro'}}"><span aria-hidden="true" ng-bind="$ctrl.theme === 'claro' ? '☾' : '☼'"></span><span class="theme-text" ng-bind="$ctrl.theme === 'claro' ? 'Modo escuro' : 'Modo claro'"></span></button>
+        <button class="outline-button help-button" ng-click="$ctrl.helpOpen = true">Como a Dialoga responde</button>
+      </div>
+    </header>
+
+    <section class="conversation" id="conversa" aria-label="Conversa sobre vendas" ng-attr-aria-busy="{{$ctrl.busy}}">
+      <div class="welcome content-width" ng-if="!$ctrl.messages.length">
+        <img class="welcome-symbol" ng-src="{{$ctrl.assets}}marca/simbolo-{{$ctrl.theme === 'escuro' ? 'papel' : 'tinta'}}.svg" alt="" width="72" height="45">
+        <h2>Olá.</h2>
+        <p class="welcome-intro">Pergunte sobre as vendas da sua empresa.<br class="desktop-break"> A resposta vem com o número e de onde ele saiu.</p>
+        <h3 class="eyebrow suggestions-label">Perguntas que a sua empresa faz</h3>
+        <div class="suggestions">
+          <button class="cut-card suggestion" ng-disabled="$ctrl.busy" ng-click="$ctrl.ask('Quanto vendemos ontem?')"><span class="cut-card-inner"><span class="eyebrow">Total por período</span><span class="suggestion-question">Quanto vendemos ontem?</span><span class="suggestion-arrow" aria-hidden="true">→</span></span></button>
+          <button class="cut-card suggestion" ng-disabled="$ctrl.busy" ng-click="$ctrl.ask('Quais os 5 produtos mais vendidos este mês?')"><span class="cut-card-inner"><span class="eyebrow">Ranking</span><span class="suggestion-question">Quais os 5 produtos mais vendidos do mês?</span><span class="suggestion-arrow" aria-hidden="true">→</span></span></button>
+          <button class="cut-card suggestion" ng-disabled="$ctrl.busy" ng-click="$ctrl.ask('Compare setembro com agosto')"><span class="cut-card-inner"><span class="eyebrow">Comparação</span><span class="suggestion-question">Como setembro se compara a agosto?</span><span class="suggestion-arrow" aria-hidden="true">→</span></span></button>
+        </div>
+        <p class="welcome-note">Ou escreva a sua, do seu jeito.</p>
+        <p class="connection-note" ng-if="!$ctrl.status" role="status">Você pode enviar mensagens. As respostas estarão disponíveis após a integração.</p>
+      </div>
+
+      <div class="thread content-width" ng-if="$ctrl.messages.length">
+        <article class="turn" ng-repeat="turn in $ctrl.messages track by turn.id" id="turn-{{turn.id}}" aria-label="Pergunta e resposta">
+          <div class="user-message speech-bubble"><div class="cut-card"><div class="cut-card-inner" ng-bind="turn.question"></div></div></div>
+          <div class="loading-message" ng-if="turn.loading"><span class="step-loader" aria-hidden="true"><i></i><i></i><i></i></span><span>Consultando as vendas…</span></div>
+          <dialoga-response ng-if="turn.response" response="turn.response" busy="$ctrl.busy" on-action="$ctrl.action(action)"></dialoga-response>
+          <div class="request-error" ng-if="turn.error" role="alert"><p class="eyebrow"><span class="state-dot refusal-dot" aria-hidden="true"></span>Consulta indisponível</p><p ng-bind="turn.error"></p><button class="outline-button" ng-click="$ctrl.retry(turn)" ng-disabled="$ctrl.busy">Tentar novamente</button></div>
+          <p class="response-meta" ng-if="turn.response">Consulta concluída · {{(turn.elapsed / 1000).toFixed(1).replace('.', ',')}} s</p>
+        </article>
+      </div>
+    </section>
+
+    <div class="composer-area content-width">
+      <form class="composer" ng-submit="$ctrl.ask($ctrl.prompt)" ng-class="{'is-busy': $ctrl.busy}" aria-label="Fazer uma pergunta">
+        <label class="sr-only" for="pergunta">Sua pergunta sobre vendas</label>
+        <textarea id="pergunta" name="pergunta" rows="1" maxlength="500" ng-model="$ctrl.prompt" ng-keydown="$ctrl.keydown($event)" ng-disabled="$ctrl.busy" placeholder="Pergunte sobre as vendas da sua empresa" aria-describedby="composer-hint input-error"></textarea>
+        <button class="send-button" type="submit" ng-disabled="$ctrl.busy || !$ctrl.prompt.trim()" aria-label="Enviar pergunta"><span aria-hidden="true">→</span></button>
+      </form>
+      <p class="input-error" id="input-error" ng-bind="$ctrl.inputError" ng-if="$ctrl.inputError" role="alert"></p>
+      <p class="composer-hint" id="composer-hint">A Dialoga só lê os seus dados. Nada no sistema é alterado.</p>
+    </div>
+    <p class="sr-only" role="status" aria-live="polite" aria-atomic="true" ng-bind="$ctrl.announcement"></p>
+  </main>
+
+  <div class="modal-backdrop" ng-if="$ctrl.helpOpen" ng-click="$event.target === $event.currentTarget && ($ctrl.helpOpen = false)">
+    <section class="help-dialog" role="dialog" aria-modal="true" aria-labelledby="help-title" dialoga-focus-trap="$ctrl.helpOpen">
+      <button class="icon-button modal-close" ng-click="$ctrl.helpOpen = false" aria-label="Fechar explicação">×</button>
+      <img ng-src="{{$ctrl.assets}}marca/simbolo-{{$ctrl.theme === 'escuro' ? 'papel' : 'tinta'}}.svg" alt="" width="44" height="28">
+      <h2 id="help-title">Pergunte. Seu negócio responde.</h2>
+      <p>A resposta vem com o número, o período e o critério usado. Se faltar informação, a Dialoga pergunta antes. Se não souber, ela diz.</p>
+      <dl class="help-states"><div><dt><span class="state-dot answer-dot"></span>Resposta</dt><dd>Um número com contexto e origem.</dd></div><div><dt><span class="state-dot refusal-dot"></span>Não sei</dt><dd>O motivo e uma alternativa útil.</dd></div><div><dt><span class="state-dot clarify-dot"></span>Uma pergunta antes</dt><dd>Uma escolha para esclarecer a consulta.</dd></div></dl>
+      <p>As informações serão consultadas na base configurada pela sua empresa. A Dialoga não altera registros. Enquanto a base não estiver conectada, você pode enviar mensagens, mas elas ficam sem resposta.</p>
+      <button class="new-conversation" ng-click="$ctrl.helpOpen = false">Entendi, quero perguntar</button>
+    </section>
+  </div>
+</div>
