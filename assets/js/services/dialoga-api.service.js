@@ -21,7 +21,7 @@
     return {
       status: function () {
         return http.status().then(function (s) {
-          if (!s || !s.base || !/^\d{4}-\d{2}-\d{2}$/.test(s.hoje) || !s.base.inicio || !s.base.fim) return $q.reject({ message: 'Não foi possível identificar a cobertura da base.' });
+          if (!s || !s.base || !/^\d{4}-\d{2}-\d{2}$/.test(s.hoje) || !['inicio', 'fim'].every(k => s.base[k] === null || /^\d{4}-\d{2}-\d{2}$/.test(s.base[k]))) return $q.reject({ message: 'Não foi possível identificar a cobertura da base.' });
           return s;
         });
       },

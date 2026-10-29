@@ -66,7 +66,7 @@
         vm.history.unshift(history);
         vm.currentId = turn.id;
         scrollToMessage(turn.id);
-        if (!vm.status) {
+        if (!vm.status || vm.status.consultas_disponiveis === false) {
           vm.announcement = 'Mensagem adicionada à conversa.';
           focusInput();
           return;

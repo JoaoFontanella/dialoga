@@ -1,28 +1,39 @@
 # Dialoga
 
-Site para consultar dados de vendas por meio de perguntas em português, apresentando respostas com contexto e origem dos dados.
+## Requisitos
 
-O frontend está implementado. **Ainda falta desenvolver o backend em PHP com CodeIgniter 3 e integrar o PostgreSQL.** Até essa integração, é possível enviar mensagens e visualizá-las na conversa, mas não há respostas.
+Para Windows ou Linux:
 
-## Tecnologias
+- Node.js com npm.
+- Python 3.7 ou superior.
+- PHP 7.4 ou superior com a extensão `pdo_pgsql` habilitada.
+- PostgreSQL em execução, com o banco importado de `database/selfhealing_db.sql`.
 
-- **Frontend:** HTML5, CSS3, JavaScript e AngularJS 1.8.3.
-- **Backend previsto:** PHP com CodeIgniter 3.
-- **Banco de dados:** PostgreSQL.
-- **Execução local do frontend:** servidor HTTP do Python 3.
+Os executáveis devem estar disponíveis no `PATH`. No Windows, o Python também pode ser localizado pelo launcher `py`.
 
-## Como rodar
+## Configuração do .env
 
-No terminal, entre na pasta `dialoga` e execute:
+Crie ou edite o arquivo `.env` na raiz do projeto:
 
-```bash
-python3 -m http.server 8080 --bind 127.0.0.1
+```dotenv
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=selfhealing_db
+DB_USERNAME=postgres
+DB_PASSWORD="sua_senha"
+DB_SSLMODE=prefer
 ```
 
-Acesse [http://localhost:8080/](http://localhost:8080/).
+Preencha com as credenciais do seu PostgreSQL. O `.env` é local e está ignorado pelo Git.
 
-Para parar o servidor, pressione **Ctrl+C** no mesmo terminal. Esse comando serve o frontend; o backend PHP ainda não está disponível.
+## Rodar
 
-## Banco de dados
+Dentro da pasta `dialoga`, execute:
 
-O banco já está exportado em [database/selfhealing_db.sql](database/selfhealing_db.sql), com estrutura e dados, pronto para importar em um banco PostgreSQL vazio.
+```bash
+npm start
+```
+
+Caso necessário execute `npm install`. Acesse [http://localhost:8080](http://localhost:8080).
+
+Para encerrar, pressione **Ctrl+C** no mesmo terminal. Após alterar o `.env`, reinicie o servidor.

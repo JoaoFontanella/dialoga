@@ -1,0 +1,4 @@
+# Impede acesso HTTP às credenciais em servidores Apache 2.4.
+<FilesMatch "^\.env(?:\..*)?$">
+    Require all denied
+</FilesMatch>

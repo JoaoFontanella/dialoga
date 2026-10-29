@@ -20,7 +20,7 @@
       <p class="eyebrow">Base de vendas</p>
       <p class="base-name" ng-bind="$ctrl.status ? 'Vendas · ERP' : 'Base não conectada'"></p>
       <p class="read-only" ng-if="$ctrl.status"><span class="state-dot answer-dot" aria-hidden="true"></span>Só lê. Nada é alterado.</p>
-      <p class="base-coverage" ng-if="$ctrl.status">{{$ctrl.format.data($ctrl.status.base.inicio)}} a {{$ctrl.format.data($ctrl.status.base.fim)}}</p>
+      <p class="base-coverage" ng-if="$ctrl.status && $ctrl.status.base.inicio && $ctrl.status.base.fim">{{$ctrl.format.data($ctrl.status.base.inicio)}} a {{$ctrl.format.data($ctrl.status.base.fim)}}</p>
       <p class="base-coverage" ng-if="!$ctrl.status">As respostas estarão disponíveis após a integração.</p>
       <p class="base-coverage" ng-if="$ctrl.statusLoading">Identificando a base…</p>
       <div class="status-error" ng-if="$ctrl.statusError" role="status">Não foi possível conectar.<button class="text-button" ng-click="$ctrl.loadStatus()" ng-disabled="$ctrl.statusLoading">Tentar novamente</button></div>
@@ -52,7 +52,7 @@
           <button class="cut-card suggestion" ng-disabled="$ctrl.busy" ng-click="$ctrl.ask('Compare setembro com agosto')"><span class="cut-card-inner"><span class="eyebrow">Comparação</span><span class="suggestion-question">Como setembro se compara a agosto?</span><span class="suggestion-arrow" aria-hidden="true">→</span></span></button>
         </div>
         <p class="welcome-note">Ou escreva a sua, do seu jeito.</p>
-        <p class="connection-note" ng-if="!$ctrl.status" role="status">Você pode enviar mensagens. As respostas estarão disponíveis após a integração.</p>
+        <p class="connection-note" ng-if="!$ctrl.status || $ctrl.status.consultas_disponiveis === false" role="status">Você pode enviar mensagens. As respostas estarão disponíveis após a integração.</p>
       </div>
 
       <div class="thread content-width" ng-if="$ctrl.messages.length">

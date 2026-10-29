@@ -4,7 +4,7 @@
   "private": true,
   "description": "Frontend AngularJS da Dialoga, preparado para CodeIgniter 3 e PostgreSQL.",
   "scripts": {
-    "start": "python3 -m http.server 8080 --bind 127.0.0.1 --directory .",
+    "start": "node tools/start.cjs",
     "test": "node tests/static.test.cjs",
     "test:browser": "node tests/browser.cjs"
   }
