@@ -7,25 +7,27 @@
       <button class="icon-button close-sidebar" ng-click="$ctrl.menuOpen = false" aria-label="Fechar histórico">×</button>
     </div>
     <button class="new-conversation" ng-click="$ctrl.newConversation()" ng-disabled="$ctrl.busy"><span aria-hidden="true">+</span> Nova pergunta</button>
-    <nav class="history" aria-label="Histórico da sessão">
+    <nav class="history" aria-label="Histórico de perguntas">
       <h2 class="eyebrow">Histórico</h2>
       <p class="history-empty" ng-if="!$ctrl.history.length">Suas perguntas aparecem aqui.<br>Uma conversa de cada vez.</p>
       <ul>
         <li ng-repeat="entry in $ctrl.history track by entry.id">
           <button ng-click="$ctrl.visit(entry)" ng-disabled="$ctrl.busy" ng-class="{'is-current': $ctrl.currentId === entry.id}" ng-attr-aria-current="{{$ctrl.currentId === entry.id ? 'true' : undefined}}"><span ng-bind="entry.question"></span></button>
+          <p class="history-error" ng-if="$ctrl.historyError === entry.id" role="status">Não foi possível abrir.</p>
         </li>
       </ul>
     </nav>
     <div class="base-info">
-      <p class="eyebrow">Base de vendas</p>
-      <p class="base-name" ng-bind="$ctrl.status ? 'Vendas · ERP' : 'Base não conectada'"></p>
+      <p class="eyebrow">Base conectada</p>
+      <p class="base-name" ng-bind="$ctrl.status ? ($ctrl.status.nome_base || 'Vendas · ERP') : 'Base não conectada'"></p>
       <p class="read-only" ng-if="$ctrl.status"><span class="state-dot answer-dot" aria-hidden="true"></span>Só lê. Nada é alterado.</p>
       <p class="base-coverage" ng-if="$ctrl.status && $ctrl.status.base.inicio && $ctrl.status.base.fim">{{$ctrl.format.data($ctrl.status.base.inicio)}} a {{$ctrl.format.data($ctrl.status.base.fim)}}</p>
       <p class="base-coverage" ng-if="!$ctrl.status">As respostas estarão disponíveis após a integração.</p>
       <p class="base-coverage" ng-if="$ctrl.statusLoading">Identificando a base…</p>
       <div class="status-error" ng-if="$ctrl.statusError" role="status">Não foi possível conectar.<button class="text-button" ng-click="$ctrl.loadStatus()" ng-disabled="$ctrl.statusLoading">Tentar novamente</button></div>
     </div>
-    <div class="session-info"><span class="session-monogram" aria-hidden="true">D</span><div><span>Sua sessão</span><small>Histórico neste navegador</small></div></div>
+    <div class="session-info" ng-if="$ctrl.status.usuario"><span class="session-monogram" aria-hidden="true" ng-bind="$ctrl.initials($ctrl.status.usuario.nome)"></span><div><span ng-bind="$ctrl.status.usuario.nome"></span><small ng-bind="$ctrl.status.usuario.cargo"></small></div></div>
+    <div class="session-info" ng-if="!$ctrl.status.usuario"><span class="session-monogram" aria-hidden="true">D</span><div><span>Sua sessão</span><small>Histórico neste navegador</small></div></div>
   </aside>
 
   <main class="workspace" ng-attr-inert="{{$ctrl.helpOpen ? '' : undefined}}">
@@ -33,7 +35,8 @@
       <button class="icon-button menu-button" ng-click="$ctrl.menuOpen = true" aria-controls="lateral" ng-attr-aria-expanded="{{$ctrl.menuOpen}}" aria-label="Abrir histórico"><span class="menu-lines" aria-hidden="true"></span></button>
       <img class="mobile-symbol" ng-src="{{$ctrl.assets}}marca/simbolo-{{$ctrl.theme === 'escuro' ? 'papel' : 'tinta'}}.svg" alt="" width="28" height="20">
       <h1>Vendas</h1>
-      <span class="reference-date" ng-if="$ctrl.status">Data de referência · {{$ctrl.format.data($ctrl.status.hoje)}}</span>
+      <span class="reference-date eyebrow" ng-if="$ctrl.status.periodo_padrao">Período padrão · {{$ctrl.status.periodo_padrao}}</span>
+      <span class="read-only-badge eyebrow" ng-if="$ctrl.status"><span class="state-dot answer-dot" aria-hidden="true"></span>Só lê</span>
       <div class="topbar-actions">
         <button class="theme-button" ng-click="$ctrl.toggleTheme()" ng-attr-aria-label="Ativar modo {{$ctrl.theme === 'claro' ? 'escuro' : 'claro'}}" ng-attr-title="Modo {{$ctrl.theme === 'claro' ? 'escuro' : 'claro'}}"><span aria-hidden="true" ng-bind="$ctrl.theme === 'claro' ? '☾' : '☼'"></span><span class="theme-text" ng-bind="$ctrl.theme === 'claro' ? 'Modo escuro' : 'Modo claro'"></span></button>
         <button class="outline-button help-button" ng-click="$ctrl.helpOpen = true">Como a Dialoga responde</button>
@@ -43,7 +46,7 @@
     <section class="conversation" id="conversa" aria-label="Conversa sobre vendas" ng-attr-aria-busy="{{$ctrl.busy}}">
       <div class="welcome content-width" ng-if="!$ctrl.messages.length">
         <img class="welcome-symbol" ng-src="{{$ctrl.assets}}marca/simbolo-{{$ctrl.theme === 'escuro' ? 'papel' : 'tinta'}}.svg" alt="" width="72" height="45">
-        <h2>Olá.</h2>
+        <h2>Olá{{$ctrl.status.usuario.nome ? ', ' + $ctrl.status.usuario.nome : ''}}.</h2>
         <p class="welcome-intro">Pergunte sobre as vendas da sua empresa.<br class="desktop-break"> A resposta vem com o número e de onde ele saiu.</p>
         <h3 class="eyebrow suggestions-label">Perguntas que a sua empresa faz</h3>
         <div class="suggestions">
@@ -69,7 +72,7 @@
     <div class="composer-area content-width">
       <form class="composer" ng-submit="$ctrl.ask($ctrl.prompt)" ng-class="{'is-busy': $ctrl.busy}" aria-label="Fazer uma pergunta">
         <label class="sr-only" for="pergunta">Sua pergunta sobre vendas</label>
-        <textarea id="pergunta" name="pergunta" rows="1" maxlength="500" ng-model="$ctrl.prompt" ng-keydown="$ctrl.keydown($event)" ng-disabled="$ctrl.busy" placeholder="Pergunte sobre as vendas da sua empresa" aria-describedby="composer-hint input-error"></textarea>
+        <textarea id="pergunta" name="pergunta" rows="1" maxlength="500" ng-model="$ctrl.prompt" ng-keydown="$ctrl.keydown($event)" ng-disabled="$ctrl.busy" ng-attr-placeholder="{{$ctrl.compact ? 'Pergunte sobre as vendas' : 'Pergunte sobre as vendas da sua empresa'}}" aria-describedby="composer-hint input-error"></textarea>
         <button class="send-button" type="submit" ng-disabled="$ctrl.busy || !$ctrl.prompt.trim()" aria-label="Enviar pergunta"><span aria-hidden="true">→</span></button>
       </form>
       <p class="input-error" id="input-error" ng-bind="$ctrl.inputError" ng-if="$ctrl.inputError" role="alert"></p>

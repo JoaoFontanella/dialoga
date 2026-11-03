@@ -8,3 +8,6 @@ docs/
 !.env.example
 __pycache__/
 *.pyc
+application/logs/log-*.php
+application/cache/*
+!application/cache/index.html

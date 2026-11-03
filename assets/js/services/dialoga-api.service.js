@@ -2,9 +2,7 @@
   'use strict';
   angular.module('dialoga').factory('dialogaApi', ['$q', 'httpAdapter', function ($q, http) {
     function normalizar(r) {
-      if (!r || !['resposta', 'recusa', 'esclarecer'].includes(r.tipo) || typeof r.texto !== 'string') {
-        return $q.reject({ message: 'A resposta recebida está em um formato inesperado.' });
-      }
+      if (!r || !['resposta', 'recusa', 'esclarecer'].includes(r.tipo) || typeof r.texto !== 'string') return null;
       return {
         tipo: r.tipo,
         texto: r.texto,
@@ -25,7 +23,28 @@
           return s;
         });
       },
-      perguntar: function (q, contexto) { return http.perguntar(q, contexto).then(normalizar); }
+      perguntar: function (q, contexto, conversaId) {
+        return http.perguntar(q, contexto, conversaId).then(function (r) {
+          return normalizar(r) || $q.reject({ message: 'A resposta recebida está em um formato inesperado.' });
+        });
+      },
+      historico: function () {
+        return http.historico().then(function (h) {
+          return (h && Array.isArray(h.perguntas) ? h.perguntas : [])
+            .filter(p => p && Number.isFinite(p.id) && typeof p.conversa === 'string' && typeof p.pergunta === 'string')
+            .map(p => ({ id: 's' + p.id, conversa: p.conversa, question: p.pergunta }));
+        });
+      },
+      conversa: function (id) {
+        return http.conversa(id).then(function (c) {
+          return (c && Array.isArray(c.turnos) ? c.turnos : [])
+            .filter(t => t && Number.isFinite(t.id) && typeof t.pergunta === 'string')
+            .map(function (t) {
+              const response = normalizar(t.resposta);
+              return { id: 's' + t.id, question: t.pergunta, context: null, response: response, elapsed: response && response.tempo_ms !== null ? response.tempo_ms : 0, error: response ? null : 'Esta resposta não pôde ser exibida.' };
+            });
+        });
+      }
     };
   }]);
 })();
