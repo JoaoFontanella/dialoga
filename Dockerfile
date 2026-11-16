@@ -1,6 +1,6 @@
 FROM php:8.2-cli
 
-# Instala dependências do sistema e bibliotecas para o PostgreSQL
+# Instala dependências do sistema, bibliotecas para o PostgreSQL e os certificados SSL
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -10,6 +10,8 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     libpq-dev \
+    ca-certificates \
+    && update-ca-certificates \
     && docker-php-ext-install pdo pdo_pgsql pgsql
 
 # Instala o Node.js (versão 20 LTS)
