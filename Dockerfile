@@ -1,7 +1,6 @@
-# Usa uma imagem oficial do PHP (versão CLI ou Apache, ajuste conforme sua necessidade)
 FROM php:8.2-cli
 
-# Instala dependências essenciais do sistema operacional
+# Instala dependências do sistema e bibliotecas para o PostgreSQL
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -9,27 +8,27 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     zip \
-    unzip
+    unzip \
+    libpq-dev \
+    && docker-php-ext-install pdo pdo_pgsql pgsql
 
-# Instala o Node.js (versão 20 LTS neste exemplo)
+# Instala o Node.js (versão 20 LTS)
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs
 
-# Instala o Composer (caso o seu projeto utilize PHP Composer)
+# Instala o Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Define o diretório de trabalho dentro do contêiner
+# Define o diretório de trabalho
 WORKDIR /app
 
-# Copia os arquivos do projeto para o contêiner
+# Copia os arquivos do projeto
 COPY . .
 
-# Instala as dependências Node.js
+# Instala dependências Node.js
 RUN npm install
 
-# Porta padrão que o Render expõe (ajuste se sua aplicação usar outra porta, ex: 3000)
 EXPOSE 10000
 ENV PORT=10000
 
-# Comando para iniciar a aplicação (conforme definido no seu package.json)
 CMD ["npm", "start"]
